@@ -1,45 +1,68 @@
-import { signOut } from "firebase/auth";
-import React from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import React, { useEffect } from "react";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, removeUser } from "../utils/userSlice";
+import { LOGO } from "../utils/constants";
 
 const Header = () => {
-  const navigate=useNavigate()
-  const user=useSelector((store)=> store.user)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((store) => store.user);
   const handleClickOfSignout = () => {
     signOut(auth)
       .then(() => {
         // Sign-out successful.
-        navigate("/")
+        navigate("/");
       })
       .catch((error) => {
         // An error happened.
-        navigate("/error")
+        navigate("/error");
       });
   };
+  useEffect(() => {
+    // this is called when signed in,up and out
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayName, photoURL } = user;
+        dispatch(
+          addUser({
+            uid: uid,
+            email: email,
+            displayName: displayName,
+            photoURL: photoURL,
+          })
+        );
+        navigate("/browse");
+      } else {
+        // User is signed out
+        dispatch(removeUser());
+        navigate("/");
+      }
+    });
+    // returns when component unsubscribed/unmounted
+    return () => unsubscribe();
+  }, []);
   return (
     <div className="absolute w-screen z-10 px-8 py-2 bg-gradient-to-b from-black flex justify-between">
-      <img
-        className="w-44 "
-        src="https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
-        alt="logo"
-      />
-      {user&&<div className="flex p-2">
-        <img
-          alt="user-icon"
-          src={user?.photoURL}
-          // src="https://wallpapers.com/images/hd/netflix-profile-pictures-1000-x-1000-qo9h82134t9nv0j0.jpg"
-          className="w-10 m-4 rounded-m"
-        />
-        {/* <p className="m-4 px-2">{user.displayName}</p> */}
-        <button
-          onClick={handleClickOfSignout}
-          className="font-bold text-l bg-red-500  my-4 rounded-lg p-2 text-white"
-        >
-          sign Out
-        </button>
-      </div>}
+      <img className="w-44 " src={LOGO} alt="logo" />
+      {user && (
+        <div className="flex p-2">
+          <img
+            alt="user-icon"
+            src={user?.photoURL}
+            className="w-10 m-4 rounded-m"
+          />
+          {/* <p className="m-4 px-2">{user.displayName}</p> */}
+          <button
+            onClick={handleClickOfSignout}
+            className="font-bold text-l bg-red-500  my-4 rounded-lg p-2 text-white"
+          >
+            sign Out
+          </button>
+        </div>
+      )}
     </div>
   );
 };
