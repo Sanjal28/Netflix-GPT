@@ -3,6 +3,7 @@ import { API_OPTIONS } from "../utils/constants";
 import { addTrailerVideo } from "../utils/moviesSlice";
 import { useEffect } from "react";
 
+// custom hook
 const useMovieTrailer = (movieID) => {
   const dispatch = useDispatch();
   // fetch trailer video and update the store with trailer video
