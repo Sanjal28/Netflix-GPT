@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../utils/userSlice";
 import { LOGO } from "../utils/constants";
+import { toggleGptSearchView } from "../utils/gptSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+  const showGptSearch = useSelector((store) => store.gpt.showGptSearch);
   const handleClickOfSignout = () => {
     signOut(auth)
       .then(() => {
@@ -44,11 +46,20 @@ const Header = () => {
     // returns when component unsubscribed/unmounted
     return () => unsubscribe();
   }, []);
+  const handleGptSearchClick = () => {
+    dispatch(toggleGptSearchView());
+  };
   return (
-    <div className="absolute w-screen z-10 px-8 py-2 bg-gradient-to-b from-black flex justify-between">
-      <img className="w-44 " src={LOGO} alt="logo" />
+    <div className="absolute w-screen z-10 px-8 py-2 bg-gradient-to-b from-black flex flex-col md:flex-row sm:flex-row justify-between">
+      <img className="w-44 mx-auto sm:mx-0" src={LOGO} alt="logo" />
       {user && (
-        <div className="flex p-2">
+        <div className="flex p-2 mx-auto sm:mx-0">
+          <button
+            className="font-bold text-l bg-red-600  my-4 rounded-lg p-2 text-white"
+            onClick={handleGptSearchClick}
+          >
+            {showGptSearch ? "Home" : "Netflix-GPT"}
+          </button>
           <img
             alt="user-icon"
             src={user?.photoURL}
@@ -57,9 +68,9 @@ const Header = () => {
           {/* <p className="m-4 px-2">{user.displayName}</p> */}
           <button
             onClick={handleClickOfSignout}
-            className="font-bold text-l bg-red-500  my-4 rounded-lg p-2 text-white"
+            className="font-bold text-l bg-red-600  my-4 rounded-lg p-2 text-white"
           >
-            sign Out
+            Sign Out
           </button>
         </div>
       )}
