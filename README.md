@@ -1,3 +1,5 @@
+# Netflix-GPT
+
 # Features
 - Login/Sign Up
     - Sign In /Sign up Form
@@ -5,7 +7,7 @@
 - Browse (after authentication)
     - Header
     - Main Movie
-        - Tailer in Background
+        - Trailer in Background
         - Title & Description
         - MovieSuggestions
             - MovieLists * N 
